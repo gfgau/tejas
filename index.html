@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hologram Grid Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            width: 100vw;
+            height: 100vh;
+            display: none; /* Initially hidden */
+        }
+
+        .grid-item {
+            background-color: #1f1f1f;
+            border: 2px solid none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            object-fit: cover;
+        }
+
+        #control-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            background-color: #1f1f1f;
+            color: white;
+            border: 2px solid #4caf50;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4caf50;
+            color: black;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Hologram Grid Display</h1>
+
+    <div id="control-buttons">
+        <button id="start-camera">Start Live Camera</button>
+        <button id="start-old-videos">Play Old Videos</button>
+    </div>
+
+    <div class="grid-container">
+        <div class="grid-item"></div>
+        <div class="grid-item" id="normal-video"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item" id="rotate-270"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item" id="rotate-90"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item" id="rotate-180"></div>
+        <div class="grid-item"></div>
+    </div>
+
+    <script>
+        const startCameraButton = document.getElementById('start-camera');
+        const startOldVideosButton = document.getElementById('start-old-videos');
+        const gridContainer = document.querySelector('.grid-container');
+        const controlButtons = document.getElementById('control-buttons');
+
+        let videoElements = [];
+        let stream = null;
+
+        function enableFullScreen() {
+            const element = document.documentElement;
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        }
+
+        function disableFullScreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        function createVideoElement(transform) {
+            const video = document.createElement('video');
+            video.autoplay = true;
+            video.playsInline = true;
+            video.style.transform = transform;
+            return video;
+        }
+
+        function startCamera() {
+            enableFullScreen();
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((mediaStream) => {
+                    stream = mediaStream;
+
+                    const normalVideo = createVideoElement('none');
+                    const rotated180Video = createVideoElement('rotate(180deg)');
+                    const rotated90Video = createVideoElement('rotate(90deg)');
+                    const rotated270Video = createVideoElement('rotate(-90deg)');
+
+                    normalVideo.srcObject = stream;
+                    rotated180Video.srcObject = stream;
+                    rotated90Video.srcObject = stream;
+                    rotated270Video.srcObject = stream;
+
+                    document.getElementById('normal-video').appendChild(normalVideo);
+                    document.getElementById('rotate-180').appendChild(rotated180Video);
+                    document.getElementById('rotate-90').appendChild(rotated90Video);
+                    document.getElementById('rotate-270').appendChild(rotated270Video);
+
+                    videoElements = [normalVideo, rotated180Video, rotated90Video, rotated270Video];
+
+                    gridContainer.style.display = 'grid';
+                    controlButtons.classList.add('hidden');
+                })
+                .catch((error) => {
+                    alert('Error accessing camera: ' + error.message);
+                });
+        }
+
+
+        function playOldVideos() {
+            enableFullScreen();
+
+            const oldVideoPaths = ['old/video1.mp4', 'old/video2.mp4', 'old/video3.mp4', 'old/video4.mp4'];
+
+            const normalVideo = createVideoElement('none');
+            const rotated180Video = createVideoElement('rotate(180deg)');
+            const rotated90Video = createVideoElement('rotate(90deg)');
+            const rotated270Video = createVideoElement('rotate(-90deg)');
+
+            normalVideo.src = oldVideoPaths[0];
+            rotated180Video.src = oldVideoPaths[1];
+            rotated90Video.src = oldVideoPaths[2];
+            rotated270Video.src = oldVideoPaths[3];
+
+            document.getElementById('normal-video').appendChild(normalVideo);
+            document.getElementById('rotate-180').appendChild(rotated180Video);
+            document.getElementById('rotate-90').appendChild(rotated90Video);
+            document.getElementById('rotate-270').appendChild(rotated270Video);
+
+            videoElements = [normalVideo, rotated180Video, rotated90Video, rotated270Video];
+            videoElements.forEach(video => video.play());
+
+            gridContainer.style.display = 'grid';
+            controlButtons.classList.add('hidden');
+        }
+
+        startCameraButton.addEventListener('click', startCamera);
+        startOldVideosButton.addEventListener('click', playOldVideos);
+    </script>
+</body>
+</html>
