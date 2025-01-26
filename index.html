@@ -25,6 +25,7 @@
             grid-template-rows: repeat(3, 1fr);
             width: 100vw;
             height: 100vh;
+            display: none; /* Initially hidden */
         }
 
         .grid-item {
@@ -44,6 +45,31 @@
             object-fit: cover;
         }
 
+        #control-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            background-color: #1f1f1f;
+            color: white;
+            border: 2px solid #4caf50;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4caf50;
+            color: black;
+        }
+
+        .hidden {
+            display: none;
+        }
+
         /* Style for Stop button */
         .stop-button {
             position: fixed;
@@ -61,6 +87,13 @@
     </style>
 </head>
 <body>
+    <h1>Hologram Grid Display</h1>
+
+    <div id="control-buttons">
+        <button id="start-camera">Start Live Camera</button>
+        <button id="start-old-videos">Play Old Videos</button>
+    </div>
+
     <div class="grid-container">
         <div class="grid-item"></div>
         <div class="grid-item" id="normal-video"></div>
@@ -73,10 +106,15 @@
         <div class="grid-item"></div>
     </div>
 
-    <button class="stop-button" onclick="exitFullscreen()">Stop</button>
+    <button class="stop-button hidden" onclick="exitFullscreen()">Stop</button>
 
     <script>
+        const startCameraButton = document.getElementById('start-camera');
+        const startOldVideosButton = document.getElementById('start-old-videos');
         const gridContainer = document.querySelector('.grid-container');
+        const controlButtons = document.getElementById('control-buttons');
+        const stopButton = document.querySelector('.stop-button');
+
         let videoElements = [];
         let stream = null;
 
@@ -132,17 +170,49 @@
                     document.getElementById('rotate-270').appendChild(rotated270Video);
 
                     videoElements = [normalVideo, rotated180Video, rotated90Video, rotated270Video];
+
+                    gridContainer.style.display = 'grid';
+                    controlButtons.classList.add('hidden');
+                    stopButton.classList.remove('hidden');
                 })
                 .catch((error) => {
                     alert('Error accessing camera: ' + error.message);
                 });
         }
 
+        function playOldVideos() {
+            enableFullScreen();
+
+            const oldVideoPaths = ['old/video1.mp4', 'old/video2.mp4', 'old/video3.mp4', 'old/video4.mp4'];
+
+            const normalVideo = createVideoElement('none');
+            const rotated180Video = createVideoElement('rotate(180deg)');
+            const rotated90Video = createVideoElement('rotate(90deg)');
+            const rotated270Video = createVideoElement('rotate(-90deg)');
+
+            normalVideo.src = oldVideoPaths[0];
+            rotated180Video.src = oldVideoPaths[1];
+            rotated90Video.src = oldVideoPaths[2];
+            rotated270Video.src = oldVideoPaths[3];
+
+            document.getElementById('normal-video').appendChild(normalVideo);
+            document.getElementById('rotate-180').appendChild(rotated180Video);
+            document.getElementById('rotate-90').appendChild(rotated90Video);
+            document.getElementById('rotate-270').appendChild(rotated270Video);
+
+            videoElements = [normalVideo, rotated180Video, rotated90Video, rotated270Video];
+            videoElements.forEach(video => video.play());
+
+            gridContainer.style.display = 'grid';
+            controlButtons.classList.add('hidden');
+            stopButton.classList.remove('hidden');
+        }
+
         function exitFullscreen() {
             disableFullScreen();
 
             videoElements.forEach(video => {
-                video.srcObject = null; // Stop the video stream
+                video.srcObject = null;
                 video.remove();
             });
 
@@ -152,10 +222,13 @@
             }
 
             videoElements = [];
+            gridContainer.style.display = 'none';
+            controlButtons.classList.remove('hidden');
+            stopButton.classList.add('hidden');
         }
 
-        // Start the camera automatically on load
-        window.onload = startCamera;
+        startCameraButton.addEventListener('click', startCamera);
+        startOldVideosButton.addEventListener('click', playOldVideos);
     </script>
 </body>
 </html>
