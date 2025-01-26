@@ -111,7 +111,7 @@
 
     <script>
         const startCameraButton = document.getElementById('start-camera');
-        const startOldVideosButton = document.getElementById('start-old-videos');
+        const startOldVideos = document.getElementById('start-old-videos');
         const gridContainer = document.querySelector('.grid-container');
         const controlButtons = document.getElementById('control-buttons');
         const stopButton = document.querySelector('.stop-button');
@@ -121,6 +121,8 @@
         let stream = null;
 
         function enableFullScreen() {
+            startCameraButton.classList.add('hidden');
+            startOldVideos.classList.add('hidden')
             const element = document.documentElement;
             if (element.requestFullscreen) {
                 element.requestFullscreen();
