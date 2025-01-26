@@ -18,11 +18,6 @@
             height: 100vh;
         }
 
-        .grid-container {
-            display: none; /* Hidden until an event triggers it */
-        }
-
-        /* Fullscreen layout */
         .fullscreen-layout {
             display: none;
             position: fixed;
@@ -45,12 +40,13 @@
             object-fit: cover;
         }
 
-        /* Positioning videos based on the reference image */
+        /* Positioning and rotating videos */
         .top-video {
             width: 40%;
             height: 20%;
             top: 10%;
             left: 30%;
+            transform: rotate(0deg); /* Normal */
         }
 
         .left-video {
@@ -58,6 +54,7 @@
             height: 40%;
             left: 10%;
             top: 30%;
+            transform: rotate(90deg); /* Rotate 90 degrees */
         }
 
         .right-video {
@@ -65,6 +62,7 @@
             height: 40%;
             right: 10%;
             top: 30%;
+            transform: rotate(-90deg); /* Rotate -90 degrees */
         }
 
         .bottom-video {
@@ -72,6 +70,7 @@
             height: 20%;
             bottom: 10%;
             left: 30%;
+            transform: rotate(180deg); /* Rotate 180 degrees */
         }
 
         .stop-button {
@@ -160,11 +159,12 @@
             }
         }
 
-        function createVideoElement() {
+        function createVideoElement(transform) {
             const video = document.createElement('video');
             video.autoplay = true;
             video.playsInline = true;
             video.loop = true;
+            video.style.transform = transform;
             return video;
         }
 
@@ -175,11 +175,11 @@
                 .then((mediaStream) => {
                     stream = mediaStream;
 
-                    videoFrames.forEach((frame) => {
-                        const video = createVideoElement();
-                        video.srcObject = stream;
-                        frame.appendChild(video);
-                    });
+                    // Assign videos with appropriate transformations
+                    videoFrames[0].appendChild(createVideoElement('none')).srcObject = stream; // Top
+                    videoFrames[1].appendChild(createVideoElement('rotate(90deg)')).srcObject = stream; // Left
+                    videoFrames[2].appendChild(createVideoElement('rotate(-90deg)')).srcObject = stream; // Right
+                    videoFrames[3].appendChild(createVideoElement('rotate(180deg)')).srcObject = stream; // Bottom
 
                     fullscreenLayout.style.display = 'block';
                     document.getElementById('control-buttons').style.display = 'none';
@@ -194,12 +194,13 @@
 
             const oldVideoPaths = ['old/video1.mp4', 'old/video2.mp4', 'old/video3.mp4', 'old/video4.mp4'];
 
-            videoFrames.forEach((frame, index) => {
-                const video = createVideoElement();
-                video.src = oldVideoPaths[index];
-                frame.appendChild(video);
-                video.play();
-            });
+            // Assign videos with appropriate transformations
+            videoFrames[0].appendChild(createVideoElement('none')).src = oldVideoPaths[0]; // Top
+            videoFrames[1].appendChild(createVideoElement('rotate(90deg)')).src = oldVideoPaths[1]; // Left
+            videoFrames[2].appendChild(createVideoElement('rotate(-90deg)')).src = oldVideoPaths[2]; // Right
+            videoFrames[3].appendChild(createVideoElement('rotate(180deg)')).src = oldVideoPaths[3]; // Bottom
+
+            videoFrames.forEach((frame) => frame.firstChild.play());
 
             fullscreenLayout.style.display = 'block';
             document.getElementById('control-buttons').style.display = 'none';
