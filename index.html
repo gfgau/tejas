@@ -109,6 +109,37 @@
     cursor: pointer;
     font-size: 16px;
 }
+        .fullscreen-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0;
+    justify-items: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+}
+
+.video-frame {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.video-frame video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
     </style>
 </head>
@@ -246,6 +277,48 @@
 function exitFullscreen() {
     document.getElementById('fullscreen-layout').style.display = 'none';
 }
+
+        function toggleFullscreen() {
+    const fullscreenLayout = document.getElementById('fullscreen-layout');
+    fullscreenLayout.style.display = 'grid';
+
+    // Clear the current layout
+    fullscreenLayout.innerHTML = '';
+
+    // Create 4 video elements for the hologram effect
+    const videoPaths = ['old/video1.mp4', 'old/video2.mp4', 'old/video3.mp4', 'old/video4.mp4'];
+    const rotations = ['none', 'rotate(180deg)', 'rotate(90deg)', 'rotate(-90deg)'];
+
+    videoPaths.forEach((path, index) => {
+        const videoFrame = document.createElement('div');
+        videoFrame.className = 'video-frame';
+
+        const video = document.createElement('video');
+        video.src = path;
+        video.autoplay = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.style.transform = rotations[index];
+
+        videoFrame.appendChild(video);
+        fullscreenLayout.appendChild(videoFrame);
+    });
+
+    // Add the stop button
+    const stopButton = document.createElement('button');
+    stopButton.className = 'stop-button';
+    stopButton.textContent = 'Stop';
+    stopButton.onclick = exitFullscreen;
+
+    fullscreenLayout.appendChild(stopButton);
+}
+
+function exitFullscreen() {
+    const fullscreenLayout = document.getElementById('fullscreen-layout');
+    fullscreenLayout.style.display = 'none';
+    fullscreenLayout.innerHTML = ''; // Clear the fullscreen layout
+}
+        
     </script>
 </body>
 </html>
