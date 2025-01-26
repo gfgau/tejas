@@ -16,33 +16,76 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            overflow: hidden;
         }
 
         .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
+            display: none; /* Hidden until an event triggers it */
+        }
+
+        /* Fullscreen layout */
+        .fullscreen-layout {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100vw;
             height: 100vh;
-            display: none; /* Initially hidden */
+            background-color: black;
+            z-index: 999;
         }
 
-        .grid-item {
-            background-color: #1f1f1f;
-            border: 2px solid none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
+        .video-frame {
+            position: absolute;
+            background-color: black;
         }
 
-        video {
+        .video-frame video {
             width: 100%;
             height: 100%;
-            position: absolute;
             object-fit: cover;
+        }
+
+        /* Positioning videos based on the reference image */
+        .top-video {
+            width: 40%;
+            height: 20%;
+            top: 10%;
+            left: 30%;
+        }
+
+        .left-video {
+            width: 20%;
+            height: 40%;
+            left: 10%;
+            top: 30%;
+        }
+
+        .right-video {
+            width: 20%;
+            height: 40%;
+            right: 10%;
+            top: 30%;
+        }
+
+        .bottom-video {
+            width: 40%;
+            height: 20%;
+            bottom: 10%;
+            left: 30%;
+        }
+
+        .stop-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px 20px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
         }
 
         #control-buttons {
@@ -69,78 +112,6 @@
         .hidden {
             display: none;
         }
-/* Style for video container */
-.fullscreen-layout {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: black;
-    z-index: 999;
-}
-
-/* Video frame positioning */
-.video-frame {
-    margin: 10px;
-    background-color: grey;
-    border: 2px solid white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Center "Stop" button */
-.stop-button {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-    padding: 10px 20px;
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-        .fullscreen-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 0;
-    justify-items: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: black;
-    z-index: 999;
-}
-
-.video-frame {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-.video-frame video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
     </style>
 </head>
 <body>
@@ -151,31 +122,21 @@
         <button id="start-old-videos">Play Old Videos</button>
     </div>
 
-    <div class="grid-container">
-        <div class="grid-item"></div>
-        <div class="grid-item" id="normal-video"></div>
-        <div class="grid-item"></div>
-        <div class="grid-item" id="rotate-270"></div>
-        <div class="grid-item"></div>
-        <div class="grid-item" id="rotate-90"></div>
-        <div class="grid-item"></div>
-        <div class="grid-item" id="rotate-180"></div>
-        <div class="grid-item"></div>
+    <div id="fullscreen-layout" class="fullscreen-layout">
+        <!-- Videos will be dynamically added here -->
+        <div class="video-frame top-video"></div>
+        <div class="video-frame left-video"></div>
+        <div class="video-frame right-video"></div>
+        <div class="video-frame bottom-video"></div>
+        <button class="stop-button" onclick="exitFullscreen()">Stop</button>
     </div>
-<div id="fullscreen-layout" class="fullscreen-layout" style="display: none;">
-    <div class="video-frame" style="width: 30%; height: 20%;">Video 1</div>
-    <div class="video-frame" style="width: 20%; height: 40%;">Video 2</div>
-    <div class="video-frame" style="width: 20%; height: 40%;">Video 3</div>
-    <div class="video-frame" style="width: 30%; height: 20%;">Video 4</div>
-    <button class="stop-button" onclick="exitFullscreen()">Stop</button>
-</div>
+
     <script>
         const startCameraButton = document.getElementById('start-camera');
         const startOldVideosButton = document.getElementById('start-old-videos');
-        const gridContainer = document.querySelector('.grid-container');
-        const controlButtons = document.getElementById('control-buttons');
+        const fullscreenLayout = document.getElementById('fullscreen-layout');
+        const videoFrames = document.querySelectorAll('.video-frame');
 
-        let videoElements = [];
         let stream = null;
 
         function enableFullScreen() {
@@ -199,11 +160,11 @@
             }
         }
 
-        function createVideoElement(transform) {
+        function createVideoElement() {
             const video = document.createElement('video');
             video.autoplay = true;
             video.playsInline = true;
-            video.style.transform = transform;
+            video.loop = true;
             return video;
         }
 
@@ -214,111 +175,47 @@
                 .then((mediaStream) => {
                     stream = mediaStream;
 
-                    const normalVideo = createVideoElement('none');
-                    const rotated180Video = createVideoElement('rotate(180deg)');
-                    const rotated90Video = createVideoElement('rotate(90deg)');
-                    const rotated270Video = createVideoElement('rotate(-90deg)');
+                    videoFrames.forEach((frame) => {
+                        const video = createVideoElement();
+                        video.srcObject = stream;
+                        frame.appendChild(video);
+                    });
 
-                    normalVideo.srcObject = stream;
-                    rotated180Video.srcObject = stream;
-                    rotated90Video.srcObject = stream;
-                    rotated270Video.srcObject = stream;
-
-                    document.getElementById('normal-video').appendChild(normalVideo);
-                    document.getElementById('rotate-180').appendChild(rotated180Video);
-                    document.getElementById('rotate-90').appendChild(rotated90Video);
-                    document.getElementById('rotate-270').appendChild(rotated270Video);
-
-                    videoElements = [normalVideo, rotated180Video, rotated90Video, rotated270Video];
-
-                    gridContainer.style.display = 'grid';
-                    controlButtons.classList.add('hidden');
+                    fullscreenLayout.style.display = 'block';
+                    document.getElementById('control-buttons').style.display = 'none';
                 })
                 .catch((error) => {
                     alert('Error accessing camera: ' + error.message);
                 });
         }
 
-
         function playOldVideos() {
             enableFullScreen();
 
             const oldVideoPaths = ['old/video1.mp4', 'old/video2.mp4', 'old/video3.mp4', 'old/video4.mp4'];
 
-            const normalVideo = createVideoElement('none');
-            const rotated180Video = createVideoElement('rotate(180deg)');
-            const rotated90Video = createVideoElement('rotate(90deg)');
-            const rotated270Video = createVideoElement('rotate(-90deg)');
+            videoFrames.forEach((frame, index) => {
+                const video = createVideoElement();
+                video.src = oldVideoPaths[index];
+                frame.appendChild(video);
+                video.play();
+            });
 
-            normalVideo.src = oldVideoPaths[0];
-            rotated180Video.src = oldVideoPaths[1];
-            rotated90Video.src = oldVideoPaths[2];
-            rotated270Video.src = oldVideoPaths[3];
+            fullscreenLayout.style.display = 'block';
+            document.getElementById('control-buttons').style.display = 'none';
+        }
 
-            document.getElementById('normal-video').appendChild(normalVideo);
-            document.getElementById('rotate-180').appendChild(rotated180Video);
-            document.getElementById('rotate-90').appendChild(rotated90Video);
-            document.getElementById('rotate-270').appendChild(rotated270Video);
-
-            videoElements = [normalVideo, rotated180Video, rotated90Video, rotated270Video];
-            videoElements.forEach(video => video.play());
-
-            gridContainer.style.display = 'grid';
-            controlButtons.classList.add('hidden');
+        function exitFullscreen() {
+            disableFullScreen();
+            fullscreenLayout.style.display = 'none';
+            videoFrames.forEach((frame) => {
+                frame.innerHTML = ''; // Remove all video elements
+            });
+            document.getElementById('control-buttons').style.display = 'flex';
         }
 
         startCameraButton.addEventListener('click', startCamera);
         startOldVideosButton.addEventListener('click', playOldVideos);
-
-        function toggleFullscreen() {
-    document.getElementById('fullscreen-layout').style.display = 'flex';
-}
-
-function exitFullscreen() {
-    document.getElementById('fullscreen-layout').style.display = 'none';
-}
-
-        function toggleFullscreen() {
-    const fullscreenLayout = document.getElementById('fullscreen-layout');
-    fullscreenLayout.style.display = 'grid';
-
-    // Clear the current layout
-    fullscreenLayout.innerHTML = '';
-
-    // Create 4 video elements for the hologram effect
-    const videoPaths = ['old/video1.mp4', 'old/video2.mp4', 'old/video3.mp4', 'old/video4.mp4'];
-    const rotations = ['none', 'rotate(180deg)', 'rotate(90deg)', 'rotate(-90deg)'];
-
-    videoPaths.forEach((path, index) => {
-        const videoFrame = document.createElement('div');
-        videoFrame.className = 'video-frame';
-
-        const video = document.createElement('video');
-        video.src = path;
-        video.autoplay = true;
-        video.loop = true;
-        video.playsInline = true;
-        video.style.transform = rotations[index];
-
-        videoFrame.appendChild(video);
-        fullscreenLayout.appendChild(videoFrame);
-    });
-
-    // Add the stop button
-    const stopButton = document.createElement('button');
-    stopButton.className = 'stop-button';
-    stopButton.textContent = 'Stop';
-    stopButton.onclick = exitFullscreen;
-
-    fullscreenLayout.appendChild(stopButton);
-}
-
-function exitFullscreen() {
-    const fullscreenLayout = document.getElementById('fullscreen-layout');
-    fullscreenLayout.style.display = 'none';
-    fullscreenLayout.innerHTML = ''; // Clear the fullscreen layout
-}
-        
     </script>
 </body>
 </html>
