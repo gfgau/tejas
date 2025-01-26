@@ -20,16 +20,17 @@
         }
 
         .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            width: 100vw;
-            height: 100vh;
-            display: none; /* Initially hidden */
-        }
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px; /* Add gap between frames */
+    width: 100vw;
+    height: 100vh;
+    display: none; /* Initially hidden */
+}
 
-        .grid-item {
-    background-color: none;
+.grid-item {
+    background-color: #1f1f1f;
     border: 2px solid transparent;
     display: flex;
     align-items: center;
