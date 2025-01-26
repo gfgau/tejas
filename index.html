@@ -40,13 +40,13 @@
             object-fit: cover;
         }
 
-        /* Positioning and rotating videos */
+        /* Positions and original rotations */
         .top-video {
             width: 40%;
             height: 20%;
             top: 10%;
             left: 30%;
-            transform: rotate(0deg); /* Normal */
+            transform: rotate(0deg); /* Normal rotation */
         }
 
         .left-video {
@@ -54,7 +54,7 @@
             height: 40%;
             left: 10%;
             top: 30%;
-            transform: rotate(90deg); /* Rotate 90 degrees */
+            transform: rotate(-90deg); /* Rotate -90 degrees */
         }
 
         .right-video {
@@ -62,7 +62,7 @@
             height: 40%;
             right: 10%;
             top: 30%;
-            transform: rotate(-90deg); /* Rotate -90 degrees */
+            transform: rotate(90deg); /* Rotate 90 degrees */
         }
 
         .bottom-video {
@@ -177,8 +177,8 @@
 
                     // Assign videos with appropriate transformations
                     videoFrames[0].appendChild(createVideoElement('none')).srcObject = stream; // Top
-                    videoFrames[1].appendChild(createVideoElement('rotate(90deg)')).srcObject = stream; // Left
-                    videoFrames[2].appendChild(createVideoElement('rotate(-90deg)')).srcObject = stream; // Right
+                    videoFrames[1].appendChild(createVideoElement('rotate(-90deg)')).srcObject = stream; // Left
+                    videoFrames[2].appendChild(createVideoElement('rotate(90deg)')).srcObject = stream; // Right
                     videoFrames[3].appendChild(createVideoElement('rotate(180deg)')).srcObject = stream; // Bottom
 
                     fullscreenLayout.style.display = 'block';
@@ -196,8 +196,8 @@
 
             // Assign videos with appropriate transformations
             videoFrames[0].appendChild(createVideoElement('none')).src = oldVideoPaths[0]; // Top
-            videoFrames[1].appendChild(createVideoElement('rotate(90deg)')).src = oldVideoPaths[1]; // Left
-            videoFrames[2].appendChild(createVideoElement('rotate(-90deg)')).src = oldVideoPaths[2]; // Right
+            videoFrames[1].appendChild(createVideoElement('rotate(-90deg)')).src = oldVideoPaths[1]; // Left
+            videoFrames[2].appendChild(createVideoElement('rotate(90deg)')).src = oldVideoPaths[2]; // Right
             videoFrames[3].appendChild(createVideoElement('rotate(180deg)')).src = oldVideoPaths[3]; // Bottom
 
             videoFrames.forEach((frame) => frame.firstChild.play());
