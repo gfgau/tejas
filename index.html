@@ -29,14 +29,17 @@
         }
 
         .grid-item {
-            background-color: #1f1f1f;
-            border: 2px solid none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
+    background-color: #1f1f1f;
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 1; /* Ensures square shapes */
+    width: 100%; /* Adjusts width dynamically */
+}
+
 
         video {
             width: 100%;
