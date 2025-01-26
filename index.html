@@ -40,37 +40,37 @@
             object-fit: cover;
         }
 
-        /* Positions and original rotations */
+        /* Video Positions */
         .top-video {
             width: 40%;
             height: 20%;
-            top: 10%;
+            top: 5%;
             left: 30%;
-            transform: rotate(0deg); /* Normal rotation */
+            transform: rotate(0deg);
         }
 
         .left-video {
             width: 20%;
             height: 40%;
-            left: 10%;
             top: 30%;
-            transform: rotate(-90deg); /* Rotate -90 degrees */
+            left: 5%;
+            transform: rotate(-90deg);
         }
 
         .right-video {
             width: 20%;
             height: 40%;
-            right: 10%;
             top: 30%;
-            transform: rotate(90deg); /* Rotate 90 degrees */
+            right: 5%;
+            transform: rotate(90deg);
         }
 
         .bottom-video {
             width: 40%;
             height: 20%;
-            bottom: 10%;
+            bottom: 5%;
             left: 30%;
-            transform: rotate(180deg); /* Rotate 180 degrees */
+            transform: rotate(180deg);
         }
 
         .stop-button {
@@ -122,7 +122,6 @@
     </div>
 
     <div id="fullscreen-layout" class="fullscreen-layout">
-        <!-- Videos will be dynamically added here -->
         <div class="video-frame top-video"></div>
         <div class="video-frame left-video"></div>
         <div class="video-frame right-video"></div>
@@ -175,7 +174,6 @@
                 .then((mediaStream) => {
                     stream = mediaStream;
 
-                    // Assign videos with appropriate transformations
                     videoFrames[0].appendChild(createVideoElement('none')).srcObject = stream; // Top
                     videoFrames[1].appendChild(createVideoElement('rotate(-90deg)')).srcObject = stream; // Left
                     videoFrames[2].appendChild(createVideoElement('rotate(90deg)')).srcObject = stream; // Right
@@ -194,7 +192,6 @@
 
             const oldVideoPaths = ['old/video1.mp4', 'old/video2.mp4', 'old/video3.mp4', 'old/video4.mp4'];
 
-            // Assign videos with appropriate transformations
             videoFrames[0].appendChild(createVideoElement('none')).src = oldVideoPaths[0]; // Top
             videoFrames[1].appendChild(createVideoElement('rotate(-90deg)')).src = oldVideoPaths[1]; // Left
             videoFrames[2].appendChild(createVideoElement('rotate(90deg)')).src = oldVideoPaths[2]; // Right
