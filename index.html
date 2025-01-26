@@ -1,3 +1,5 @@
+Understand this code:
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,75 +18,33 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+            overflow: hidden;
         }
 
-        .fullscreen-layout {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             width: 100vw;
             height: 100vh;
-            background-color: black;
-            z-index: 999;
+            display: none; /* Initially hidden */
         }
 
-        .video-frame {
-            position: absolute;
-            background-color: black;
+        .grid-item {
+            background-color: #1f1f1f;
+            border: 2px solid none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
         }
 
-        .video-frame video {
+        video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-        }
-
-        /* Video Positions */
-        .top-video {
-            width: 40%;
-            height: 20%;
-            top: 5%;
-            left: 30%;
-            transform: rotate(0deg);
-        }
-
-        .left-video {
-            width: 20%;
-            height: 40%;
-            top: 30%;
-            left: 5%;
-            transform: rotate(-90deg);
-        }
-
-        .right-video {
-            width: 20%;
-            height: 40%;
-            top: 30%;
-            right: 5%;
-            transform: rotate(90deg);
-        }
-
-        .bottom-video {
-            width: 40%;
-            height: 20%;
-            bottom: 5%;
-            left: 30%;
-            transform: rotate(180deg);
-        }
-
-        .stop-button {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 10px 20px;
-            background-color: red;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
+            object-fit: cover;
         }
 
         #control-buttons {
@@ -111,6 +71,47 @@
         .hidden {
             display: none;
         }
+/* Style for video container */
+.fullscreen-layout {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999;
+}
+
+/* Video frame positioning */
+.video-frame {
+    margin: 10px;
+    background-color: grey;
+    border: 2px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Center "Stop" button */
+.stop-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    padding: 10px 20px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
     </style>
 </head>
 <body>
@@ -121,20 +122,31 @@
         <button id="start-old-videos">Play Old Videos</button>
     </div>
 
-    <div id="fullscreen-layout" class="fullscreen-layout">
-        <div class="video-frame top-video"></div>
-        <div class="video-frame left-video"></div>
-        <div class="video-frame right-video"></div>
-        <div class="video-frame bottom-video"></div>
-        <button class="stop-button" onclick="exitFullscreen()">Stop</button>
+    <div class="grid-container">
+        <div class="grid-item"></div>
+        <div class="grid-item" id="normal-video"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item" id="rotate-270"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item" id="rotate-90"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item" id="rotate-180"></div>
+        <div class="grid-item"></div>
     </div>
-
+<div id="fullscreen-layout" class="fullscreen-layout" style="display: none;">
+    <div class="video-frame" style="width: 30%; height: 20%;">Video 1</div>
+    <div class="video-frame" style="width: 20%; height: 40%;">Video 2</div>
+    <div class="video-frame" style="width: 20%; height: 40%;">Video 3</div>
+    <div class="video-frame" style="width: 30%; height: 20%;">Video 4</div>
+    <button class="stop-button" onclick="exitFullscreen()">Stop</button>
+</div>
     <script>
         const startCameraButton = document.getElementById('start-camera');
         const startOldVideosButton = document.getElementById('start-old-videos');
-        const fullscreenLayout = document.getElementById('fullscreen-layout');
-        const videoFrames = document.querySelectorAll('.video-frame');
+        const gridContainer = document.querySelector('.grid-container');
+        const controlButtons = document.getElementById('control-buttons');
 
+        let videoElements = [];
         let stream = null;
 
         function enableFullScreen() {
@@ -162,7 +174,6 @@
             const video = document.createElement('video');
             video.autoplay = true;
             video.playsInline = true;
-            video.loop = true;
             video.style.transform = transform;
             return video;
         }
@@ -174,46 +185,69 @@
                 .then((mediaStream) => {
                     stream = mediaStream;
 
-                    videoFrames[0].appendChild(createVideoElement('none')).srcObject = stream; // Top
-                    videoFrames[1].appendChild(createVideoElement('rotate(-90deg)')).srcObject = stream; // Left
-                    videoFrames[2].appendChild(createVideoElement('rotate(90deg)')).srcObject = stream; // Right
-                    videoFrames[3].appendChild(createVideoElement('rotate(180deg)')).srcObject = stream; // Bottom
+                    const normalVideo = createVideoElement('none');
+                    const rotated180Video = createVideoElement('rotate(180deg)');
+                    const rotated90Video = createVideoElement('rotate(90deg)');
+                    const rotated270Video = createVideoElement('rotate(-90deg)');
 
-                    fullscreenLayout.style.display = 'block';
-                    document.getElementById('control-buttons').style.display = 'none';
+                    normalVideo.srcObject = stream;
+                    rotated180Video.srcObject = stream;
+                    rotated90Video.srcObject = stream;
+                    rotated270Video.srcObject = stream;
+
+                    document.getElementById('normal-video').appendChild(normalVideo);
+                    document.getElementById('rotate-180').appendChild(rotated180Video);
+                    document.getElementById('rotate-90').appendChild(rotated90Video);
+                    document.getElementById('rotate-270').appendChild(rotated270Video);
+
+                    videoElements = [normalVideo, rotated180Video, rotated90Video, rotated270Video];
+
+                    gridContainer.style.display = 'grid';
+                    controlButtons.classList.add('hidden');
                 })
                 .catch((error) => {
                     alert('Error accessing camera: ' + error.message);
                 });
         }
 
+
         function playOldVideos() {
             enableFullScreen();
 
             const oldVideoPaths = ['old/video1.mp4', 'old/video2.mp4', 'old/video3.mp4', 'old/video4.mp4'];
 
-            videoFrames[0].appendChild(createVideoElement('none')).src = oldVideoPaths[0]; // Top
-            videoFrames[1].appendChild(createVideoElement('rotate(-90deg)')).src = oldVideoPaths[1]; // Left
-            videoFrames[2].appendChild(createVideoElement('rotate(90deg)')).src = oldVideoPaths[2]; // Right
-            videoFrames[3].appendChild(createVideoElement('rotate(180deg)')).src = oldVideoPaths[3]; // Bottom
+            const normalVideo = createVideoElement('none');
+            const rotated180Video = createVideoElement('rotate(180deg)');
+            const rotated90Video = createVideoElement('rotate(90deg)');
+            const rotated270Video = createVideoElement('rotate(-90deg)');
 
-            videoFrames.forEach((frame) => frame.firstChild.play());
+            normalVideo.src = oldVideoPaths[0];
+            rotated180Video.src = oldVideoPaths[1];
+            rotated90Video.src = oldVideoPaths[2];
+            rotated270Video.src = oldVideoPaths[3];
 
-            fullscreenLayout.style.display = 'block';
-            document.getElementById('control-buttons').style.display = 'none';
-        }
+            document.getElementById('normal-video').appendChild(normalVideo);
+            document.getElementById('rotate-180').appendChild(rotated180Video);
+            document.getElementById('rotate-90').appendChild(rotated90Video);
+            document.getElementById('rotate-270').appendChild(rotated270Video);
 
-        function exitFullscreen() {
-            disableFullScreen();
-            fullscreenLayout.style.display = 'none';
-            videoFrames.forEach((frame) => {
-                frame.innerHTML = ''; // Remove all video elements
-            });
-            document.getElementById('control-buttons').style.display = 'flex';
+            videoElements = [normalVideo, rotated180Video, rotated90Video, rotated270Video];
+            videoElements.forEach(video => video.play());
+
+            gridContainer.style.display = 'grid';
+            controlButtons.classList.add('hidden');
         }
 
         startCameraButton.addEventListener('click', startCamera);
         startOldVideosButton.addEventListener('click', playOldVideos);
+
+        function toggleFullscreen() {
+    document.getElementById('fullscreen-layout').style.display = 'flex';
+}
+
+function exitFullscreen() {
+    document.getElementById('fullscreen-layout').style.display = 'none';
+}
     </script>
 </body>
 </html>
