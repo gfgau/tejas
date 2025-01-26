@@ -23,10 +23,11 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 10px; /* Add gap between frames */
-    width: 100vw;
-    height: 100vh;
+    gap: 10px; /* Space between frames */
+    width: 90vmin; /* Square container based on the smaller viewport dimension */
+    height: 90vmin; /* Ensures a square grid */
     display: none; /* Initially hidden */
+    margin: auto; /* Centers the grid */
 }
 
 .grid-item {
@@ -38,7 +39,6 @@
     overflow: hidden;
     position: relative;
     aspect-ratio: 1; /* Ensures square shapes */
-    width: 100%; /* Adjusts width dynamically */
 }
 
 
