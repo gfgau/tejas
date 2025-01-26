@@ -73,21 +73,22 @@
         /* Style for Stop button */
         .stop-button {
             position: fixed;
-            top: 5%;
-            right: 5%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 1000;
-            padding: 10px 20px;
+            padding: 15px 30px;
             background-color: red;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <h1>Hologram Grid Display</h1>
+    <h1 id="main-title">Hologram Grid Display</h1>
 
     <div id="control-buttons">
         <button id="start-camera">Start Live Camera</button>
@@ -114,6 +115,7 @@
         const gridContainer = document.querySelector('.grid-container');
         const controlButtons = document.getElementById('control-buttons');
         const stopButton = document.querySelector('.stop-button');
+        const mainTitle = document.getElementById('main-title');
 
         let videoElements = [];
         let stream = null;
@@ -173,6 +175,7 @@
 
                     gridContainer.style.display = 'grid';
                     controlButtons.classList.add('hidden');
+                    mainTitle.classList.add('hidden');
                     stopButton.classList.remove('hidden');
                 })
                 .catch((error) => {
@@ -205,6 +208,7 @@
 
             gridContainer.style.display = 'grid';
             controlButtons.classList.add('hidden');
+            mainTitle.classList.add('hidden');
             stopButton.classList.remove('hidden');
         }
 
@@ -224,6 +228,7 @@
             videoElements = [];
             gridContainer.style.display = 'none';
             controlButtons.classList.remove('hidden');
+            mainTitle.classList.remove('hidden');
             stopButton.classList.add('hidden');
         }
 
